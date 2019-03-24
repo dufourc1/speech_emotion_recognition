@@ -153,7 +153,8 @@ def cross_validation_nn(net, X, y, k_fold = 5, epochs = 60, seed = 0, buffer_pat
     perform cross validation for a neural network
     buffer_path: path to a folder where to store data for a short amount of time in order to perform cross validation with the same weight initialization for each fold
 
-    if confusion_matrix is True, compute the confusion matrix on average on the folds
+    if confusion_matrix is True, compute the confusion matrix on average on the folds and return a dataframe with the values, plus the vectors y_true, y_pred concatenated trough the folds
+    to plot ut using sklearn function
     '''
 
     #build k indices for k-fold
@@ -225,6 +226,8 @@ def cross_validation_nn(net, X, y, k_fold = 5, epochs = 60, seed = 0, buffer_pat
             for j in range(7):
                 matrix[i,j]= np.round(100*len(np.where(np.asarray(dic[i]) == j)[0])/dic_length[i],decimals = 2)
         confusion_matrix = pd.DataFrame(matrix,index = emotion,columns=emotion)
-        confusion_matrix.to_csv("results/confusion_matrix.csv", index = False)
+        confusion_matrix.to_csv("results/confusion_matrix.csv")
 
-    return score_mean,scores_classe_mean, confusion_matrix
+        return score_mean,scores_classe_mean, confusion_matrix
+
+    return score_mean,scores_classe_mean
