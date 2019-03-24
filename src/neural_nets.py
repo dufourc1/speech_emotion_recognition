@@ -6,6 +6,7 @@ from torch.nn import functional as F
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 
 
 sns.set()
@@ -80,7 +81,7 @@ def compute_accuracy_per_class(x,y):
 ################################################################################
 # training the networks
 ################################################################################
-def train_model(model, train_input, train_target, test_input, test_target, optimizer, criterion, batch_size, epochs, rate_print, chrono = False, plots = False, save = False, title = "") :
+def train_model(model, train_input, train_target, test_input, test_target, optimizer, criterion, batch_size, epochs, rate_print, verbose = True, chrono = False, plots = False, save = False, title = "") :
     '''
     train a neural network with the usual parameters
     '''
@@ -107,7 +108,8 @@ def train_model(model, train_input, train_target, test_input, test_target, optim
             accuracy.append(compute_accuracy(model(test_input),test_target))
             accuracy_train.append(compute_accuracy(model(train_input),train_target))
             accuracy_test_classes.append(compute_accuracy_per_class(model(test_input),test_target))
-            print("epoch {:3}, loss training: {:4.3f}, train accuracy {:4.3f},  test accuracy {:4.3f}".format(e,Loss[-1],accuracy_train[-1],accuracy[-1]))
+            if verbose:
+                print("epoch {:3}, loss training: {:4.3f}, train accuracy {:4.3f},  test accuracy {:4.3f}".format(e,Loss[-1],accuracy_train[-1],accuracy[-1]))
 
     #plots
 
@@ -145,3 +147,84 @@ def train_model(model, train_input, train_target, test_input, test_target, optim
         if save:
             plt.savefig('results/plots/neural_net_'+ title +'_accuracy_per_class.png',dpi = 500)
         plt.show()
+
+def cross_validation_nn(net, X, y, k_fold = 5, epochs = 60, seed = 0, buffer_path = "buffer", confusion_matrix = False):
+    '''
+    perform cross validation for a neural network
+    buffer_path: path to a folder where to store data for a short amount of time in order to perform cross validation with the same weight initialization for each fold
+
+    if confusion_matrix is True, compute the confusion matrix on average on the folds
+    '''
+
+    #build k indices for k-fold
+    num_row = y.shape[0]
+    interval = int(num_row / k_fold)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    k_indices = np.array([indices[k * interval: (k + 1) * interval] for k in range(k_fold)])
+
+    scores = []
+    scores_classe = []
+
+    if confusion_matrix:
+        #prepare empty recipient to compute the confusion matrix
+        dic = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]}
+        dic_length = {0:0,1:0,2:0,3:0,4:0,5:0,6:0}
+        matrix = np.zeros((7,7))
+
+    #save the state of the model so that we can "reinitialize it"
+    torch.save(net.state_dict(), buffer_path +"/cross_val.pt")
+
+
+    for k in range(k_fold):
+        print("{}th fold training".format(k+1))
+
+        #reinitialize the weight of the model
+        net.load_state_dict(torch.load(buffer_path +"/cross_val.pt"))
+        net.eval()
+
+
+
+        #separate the data
+        te_indice = k_indices[k]
+        tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == k)]
+        tr_indice = tr_indice.reshape(-1)
+        y_te = y[te_indice]
+        y_tr = y[tr_indice]
+        x_te = X[te_indice]
+        x_tr = X[tr_indice]
+
+        #parameters to train the neural network
+        batch_size = int(y_tr.size(0)/10)
+        optimizer = torch.optim.Adam(net.parameters(),lr = 1e-4)
+        criterion = nn.CrossEntropyLoss()
+
+        #actual training
+        train_model(net, x_tr, y_tr, x_te, y_te, optimizer, criterion, batch_size, epochs, rate_print = 10, verbose = False, plots = True)
+
+        #evaluation:
+        output = net(x_te)
+        scores.append(compute_accuracy(output,y_te))
+        scores_classe.append(compute_accuracy_per_class(output,y_te))
+
+        if confusion_matrix:
+            #could do it without for loop, but I think it is clearer
+            for i, goal in enumerate(y_te):
+                dic[goal.item()].append(torch.argmax(output[i]).item())
+                dic_length[goal.item()] += 1
+
+
+    #average
+    score_mean = np.mean(np.array(scores))
+    scores_classe_mean = np.mean(np.array(scores_classe),axis = 0)
+
+    if confusion_matrix:
+        #actually compute the confusion matrix
+        emotion = ['anxiety', 'disgust', 'happy', 'boredom', 'anger', 'sadness', 'neutral']
+        for i in range(7):
+            for j in range(7):
+                matrix[i,j]= np.round(100*len(np.where(np.asarray(dic[i]) == j)[0])/dic_length[i],decimals = 2)
+        confusion_matrix = pd.DataFrame(matrix,index = emotion,columns=emotion)
+        confusion_matrix.to_csv("results/confusion_matrix.csv", index = False)
+
+    return score_mean,scores_classe_mean, confusion_matrix

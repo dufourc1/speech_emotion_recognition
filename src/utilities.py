@@ -24,6 +24,7 @@ def one_hot(y):
 
     return(torch.tensor(y_vect).type(torch.FloatTensor))
 
+
 def split_train_test(features,target, percentage_train = 0.8, normalization = True):
     '''
     split randomly a dataset into test and train
