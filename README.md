@@ -17,6 +17,7 @@ We used the following libraries for this project, with Python 3.6.5
     torch
     librosa
     python_speech_features
+    pandas
     
 Graphical:
 
