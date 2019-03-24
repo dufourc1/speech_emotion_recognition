@@ -2,9 +2,9 @@
  
 # Visium user-case interview
 
-Use case for a summer intership at Visium, Speech emotion recognition based on the berlin database Emodb 
+Use case for a summer internship at Visium, Speech emotion recognition based on the Berlin database Emodb 
 
-The purpose of this project is to find a model to properly classify emotion of the speaker given sound samples, so we can do it later live.
+The purpose of this project is to find a model to properly classify the emotion of the speaker given sound samples, so we can do it later live.
 
 ## Libraries used
 We used the following libraries for this project, with Python 3.6.5
@@ -28,7 +28,7 @@ Graphical:
 ## Prerequisites
 
 
-To install some of the libraries mentionned before , please use the following command (linux):
+To install some of the libraries mentioned before, please use the following command (Linux):
 
     pip3 install librosa
     pip install python_speech_features
@@ -56,7 +56,7 @@ The folder structure has to be the following:
 
 Import functions from `neural_networks.py`, `utilities.py`,`data_processing.py`
 
-Jupyter notebook to describe our approach to solve this classification issue. Some parts may be slow to run (features extraction),
+Jupyter notebook to describe our approach to solving this classification issue. Some parts may be slow to run (features extraction),
 due to the short deadline, not everything is optimized. This is why there are files `.csv` saved with all relevant transformations 
 already computed
 
@@ -68,11 +68,11 @@ Take in charge all of the data pipeline, the features extraction and so on
 
 Contains files saved for easy later used:
     
-     `features_exploration.html` profiling of the features
-     `drop_*.csv` try to quantify the influence of certains features in a simple neural network
+      `features_exploration.html` profiling of the features
+      `drop_*.csv` try to quantify the influence of certain features in a simple neural network
  
  #### data
-  The folder containing the audio files is `wav`. The others folders are included for the sake of completeness, and contain preprocessed data. We did not use them since we wanted computable features from the audio data only, not preprocessed by experts. Could be used to improve the accuraccy of our model.
+  The folder containing the audio files is `wav`. The other folders are included for the sake of completeness and contain preprocessed data. We did not use them since we wanted computable features from the audio data only, not preprocessed by experts. Could be used to improve the accuracy of our model.
   
   
 ## Model and accuracy
@@ -105,7 +105,7 @@ Our model is a simple neural network, fully connected, with four hidden layers a
   Librosa: Audio and music signal analysis in python.McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto
   
   
-  Hastie, T.; Tibshirani, R. & Friedman, J. (2001), The Elements of Statistical Learning , Springer New York Inc. , New York, NY, USA .
+  Hastie, T.; Tibshirani, R. & Friedman, J. (2001), The Elements of Statistical Learning, Springer New York Inc., New York, NY, USA.
 
 
 ## Author
