@@ -70,7 +70,6 @@ Take in charge all of the data pipeline, the features extraction and so on
 Contains files saved for easy later used:
 
       `features_exploration.html` profiling of the features
-      `drop_*.csv` try to quantify the influence of certain features in a simple neural network
 
  #### data
   The folder containing the audio files is `wav`. The other folders are included for the sake of completeness and contain preprocessed data. We did not use them since we wanted computable features from the audio data only, not preprocessed by experts. Could be used to improve the accuracy of our model.
