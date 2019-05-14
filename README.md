@@ -1,6 +1,6 @@
 
 
-# Visium user-case interview
+# Speech emotion recognition
 
 Use case for a summer internship at Visium, Speech emotion recognition based on the Berlin database Emodb
 
